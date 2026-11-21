@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.gguf
+*.safetensors
+*.so
+*.webm
+*.mp4
+*.log
+.env
+models/
+output/

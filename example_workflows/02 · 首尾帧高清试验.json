@@ -1,0 +1,162 @@
+{
+  "last_node_id": 4,
+  "last_link_id": 2,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "LoadImage",
+      "title": "首帧｜上传镜头起始图",
+      "pos": [
+        35,
+        100
+      ],
+      "size": [
+        290,
+        320
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "localized_name": "图像",
+          "type": "IMAGE",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "localized_name": "遮罩",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "",
+        "image"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "LoadImage",
+      "title": "尾帧｜上传镜头结束图",
+      "pos": [
+        35,
+        475
+      ],
+      "size": [
+        290,
+        320
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "localized_name": "图像",
+          "type": "IMAGE",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "localized_name": "遮罩",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "",
+        "image"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "MttS4000H3Shot",
+      "title": "MiniMax H3｜MTT S4000 有声试片",
+      "pos": [
+        390,
+        100
+      ],
+      "size": [
+        415,
+        410
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "first",
+          "localized_name": "首帧",
+          "type": "IMAGE",
+          "link": 1
+        },
+        {
+          "name": "tail",
+          "localized_name": "尾帧",
+          "type": "IMAGE",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "有声视频",
+          "type": "VIDEO",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MttS4000H3Shot"
+      },
+      "widgets_values": [
+        "576×1024 首尾帧试验档",
+        "人物缓慢抬头，观察眼前的房间。镜头平稳向前推进。",
+        "",
+        20261121211,
+        "fixed",
+        576,
+        1024
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      3,
+      0,
+      4,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
