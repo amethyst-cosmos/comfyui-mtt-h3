@@ -1,0 +1,1002 @@
+{
+  "last_node_id": 7,
+  "last_link_id": 4,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "b6d218f6-2fbb-5a58-a032-23be436abf93",
+      "pos": [
+        40,
+        100
+      ],
+      "size": [
+        395,
+        300
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "label": "提示词",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "label": "宽度",
+          "widget": {
+            "name": "width"
+          },
+          "link": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "label": "高度",
+          "widget": {
+            "name": "height"
+          },
+          "link": null
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "label": "种子",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "name": "reference",
+          "type": "IMAGE",
+          "label": "参考图（可选）",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {},
+      "widgets_values": [
+        "竖屏真人古装电影静帧。年轻中国男子穿灰色粗麻交领长袍，木簪束发，立在旧石墙与木栅前，胸上近景，面朝画面右侧。冷色窗光从画面左上照入，眼睛、脸部和衣纹清晰。无字幕、无文字。",
+        1152,
+        2048,
+        2026112201
+      ]
+    },
+    {
+      "id": 2,
+      "type": "SaveImage",
+      "title": "保存关键帧",
+      "pos": [
+        475,
+        100
+      ],
+      "size": [
+        370,
+        360
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 1
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "storyboard/keyframe"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "LoadImage",
+      "title": "镜头 01 · 首帧",
+      "pos": [
+        960,
+        100
+      ],
+      "size": [
+        290,
+        320
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "localized_name": "图像",
+          "type": "IMAGE",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "localized_name": "遮罩",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "",
+        "image"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "MttS4000H3Shot",
+      "title": "镜头 01 · 有声视频",
+      "pos": [
+        1290,
+        100
+      ],
+      "size": [
+        415,
+        410
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "first",
+          "localized_name": "首帧",
+          "type": "IMAGE",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "有声视频",
+          "type": "VIDEO",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MttS4000H3Shot"
+      },
+      "widgets_values": [
+        "448×800 基础档",
+        "人物缓慢抬头，观察眼前的房间。镜头平稳向前推进。",
+        "",
+        20261121211,
+        "fixed",
+        448,
+        800
+      ]
+    },
+    {
+      "id": 5,
+      "type": "LoadImage",
+      "title": "镜头 02 · 首帧",
+      "pos": [
+        1840,
+        100
+      ],
+      "size": [
+        290,
+        320
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "localized_name": "图像",
+          "type": "IMAGE",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "localized_name": "遮罩",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "",
+        "image"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "LoadImage",
+      "title": "镜头 02 · 尾帧",
+      "pos": [
+        1840,
+        465
+      ],
+      "size": [
+        290,
+        320
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "localized_name": "图像",
+          "type": "IMAGE",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "localized_name": "遮罩",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "",
+        "image"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "MttS4000H3Shot",
+      "title": "镜头 02 · 首尾帧有声视频",
+      "pos": [
+        2170,
+        100
+      ],
+      "size": [
+        415,
+        410
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "first",
+          "localized_name": "首帧",
+          "type": "IMAGE",
+          "link": 3
+        },
+        {
+          "name": "tail",
+          "localized_name": "尾帧",
+          "type": "IMAGE",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "有声视频",
+          "type": "VIDEO",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MttS4000H3Shot"
+      },
+      "widgets_values": [
+        "576×1024 首尾帧试验档",
+        "人物缓慢抬头，观察眼前的房间。镜头平稳向前推进。",
+        "",
+        20261121212,
+        "fixed",
+        576,
+        1024
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      3,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      3,
+      5,
+      0,
+      7,
+      0,
+      "IMAGE"
+    ],
+    [
+      4,
+      6,
+      0,
+      7,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "生图与角色参考",
+      "bounding": [
+        20,
+        45,
+        845,
+        490
+      ],
+      "color": "#4F6C89",
+      "font_size": 26,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "镜头 01 · 首帧生成",
+      "bounding": [
+        940,
+        45,
+        790,
+        490
+      ],
+      "color": "#367769",
+      "font_size": 26,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "镜头 02 · 首尾帧生成",
+      "bounding": [
+        1820,
+        45,
+        790,
+        760
+      ],
+      "color": "#6C5B85",
+      "font_size": 26,
+      "flags": {}
+    }
+  ],
+  "definitions": {
+    "subgraphs": [
+      {
+        "id": "b6d218f6-2fbb-5a58-a032-23be436abf93",
+        "version": 1,
+        "state": {
+          "lastGroupId": 0,
+          "lastNodeId": 7,
+          "lastLinkId": 16,
+          "lastRerouteId": 0
+        },
+        "revision": 0,
+        "config": {},
+        "name": "H3 Image · 生图或参考编辑",
+        "inputNode": {
+          "id": -10,
+          "bounding": [
+            -192,
+            146,
+            155,
+            128
+          ]
+        },
+        "outputNode": {
+          "id": -20,
+          "bounding": [
+            1860,
+            75,
+            128,
+            62
+          ]
+        },
+        "inputs": [
+          {
+            "id": "00bd76e6-5e83-5f64-8de8-7daf679091f5",
+            "name": "prompt",
+            "label": "提示词",
+            "type": "STRING",
+            "linkIds": [
+              12
+            ],
+            "pos": [
+              -60,
+              174
+            ]
+          },
+          {
+            "id": "56612b5c-2bc9-53a3-8a83-dce63cd79a9a",
+            "name": "width",
+            "label": "宽度",
+            "type": "INT",
+            "linkIds": [
+              13
+            ],
+            "pos": [
+              -60,
+              194
+            ]
+          },
+          {
+            "id": "bf1c6e8d-74eb-55e3-9a11-0045351effea",
+            "name": "height",
+            "label": "高度",
+            "type": "INT",
+            "linkIds": [
+              14
+            ],
+            "pos": [
+              -60,
+              214
+            ]
+          },
+          {
+            "id": "5842a7e3-cb0f-549f-9ab3-6920892eea42",
+            "name": "seed",
+            "label": "种子",
+            "type": "INT",
+            "linkIds": [
+              15
+            ],
+            "pos": [
+              -60,
+              234
+            ]
+          },
+          {
+            "id": "00b1ea46-6f3a-59bf-bc6c-1893da8ef53f",
+            "name": "reference",
+            "label": "参考图（可选）",
+            "type": "IMAGE",
+            "linkIds": [
+              16
+            ],
+            "pos": [
+              -60,
+              254
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "b97c9122-0ae6-52f2-9b56-f57b286a6177",
+            "name": "IMAGE",
+            "type": "IMAGE",
+            "linkIds": [
+              11
+            ],
+            "pos": [
+              1884,
+              100
+            ]
+          }
+        ],
+        "widgets": [],
+        "nodes": [
+          {
+            "id": 1,
+            "type": "UNETLoader",
+            "title": "H3 Image 扩散权重",
+            "pos": [
+              20,
+              20
+            ],
+            "size": [
+              340,
+              92
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [
+              {
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  4
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "UNETLoader",
+              "models": [
+                {
+                  "name": "minimax_h3_image_pruned_int8_convrot.safetensors",
+                  "directory": "diffusion_models",
+                  "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/diffusion_models/minimax_h3_image_pruned_int8_convrot.safetensors"
+                }
+              ]
+            },
+            "widgets_values": [
+              "minimax_h3_image_pruned_int8_convrot.safetensors",
+              "default"
+            ]
+          },
+          {
+            "id": 2,
+            "type": "CLIPLoader",
+            "title": "Qwen 3 VL 文本与参考图编码",
+            "pos": [
+              20,
+              162
+            ],
+            "size": [
+              340,
+              120
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [
+              {
+                "name": "CLIP",
+                "type": "CLIP",
+                "links": [
+                  1
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "CLIPLoader",
+              "models": [
+                {
+                  "name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+                  "directory": "text_encoders",
+                  "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+                }
+              ]
+            },
+            "widgets_values": [
+              "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+              "minimax",
+              "default"
+            ]
+          },
+          {
+            "id": 3,
+            "type": "VAELoader",
+            "title": "H3 Image 图像 VAE",
+            "pos": [
+              20,
+              332
+            ],
+            "size": [
+              340,
+              60
+            ],
+            "flags": {},
+            "order": 2,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [
+              {
+                "name": "VAE",
+                "type": "VAE",
+                "links": [
+                  2,
+                  9
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAELoader",
+              "models": [
+                {
+                  "name": "minimax_h3_image_vae_fp16.safetensors",
+                  "directory": "vae",
+                  "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/vae/minimax_h3_image_vae_fp16.safetensors"
+                }
+              ]
+            },
+            "widgets_values": [
+              "minimax_h3_image_vae_fp16.safetensors"
+            ]
+          },
+          {
+            "id": 4,
+            "type": "MiniMaxH3ImageConditioning",
+            "title": "H3 Image 生图｜参考图可选",
+            "pos": [
+              425,
+              150
+            ],
+            "size": [
+              420,
+              260
+            ],
+            "flags": {},
+            "order": 3,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "clip",
+                "type": "CLIP",
+                "link": 1
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 2,
+                "shape": 7
+              },
+              {
+                "name": "images.image_1",
+                "type": "IMAGE",
+                "link": 16,
+                "shape": 7
+              },
+              {
+                "name": "prompt",
+                "type": "STRING",
+                "widget": {
+                  "name": "prompt"
+                },
+                "link": 12
+              },
+              {
+                "name": "width",
+                "type": "INT",
+                "widget": {
+                  "name": "width"
+                },
+                "link": 13
+              },
+              {
+                "name": "height",
+                "type": "INT",
+                "widget": {
+                  "name": "height"
+                },
+                "link": 14
+              }
+            ],
+            "outputs": [
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "links": [
+                  3,
+                  5
+                ]
+              },
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  7
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "MiniMaxH3ImageConditioning"
+            },
+            "widgets_values": [
+              "竖屏真人古装电影静帧。年轻中国男子穿灰色粗麻交领长袍，木簪束发，立在旧石墙与木栅前，胸上近景，面朝画面右侧。冷色窗光从画面左上照入，眼睛、脸部和衣纹清晰。无字幕、无文字。",
+              1152,
+              2048
+            ]
+          },
+          {
+            "id": 5,
+            "type": "ConditioningZeroOut",
+            "title": "负向条件",
+            "pos": [
+              910,
+              315
+            ],
+            "size": [
+              215,
+              54
+            ],
+            "flags": {},
+            "order": 4,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "conditioning",
+                "type": "CONDITIONING",
+                "link": 3
+              }
+            ],
+            "outputs": [
+              {
+                "name": "CONDITIONING",
+                "type": "CONDITIONING",
+                "links": [
+                  6
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "ConditioningZeroOut"
+            },
+            "widgets_values": []
+          },
+          {
+            "id": 6,
+            "type": "KSampler",
+            "title": "H3 Image｜六步采样",
+            "pos": [
+              1190,
+              60
+            ],
+            "size": [
+              300,
+              270
+            ],
+            "flags": {},
+            "order": 5,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 4
+              },
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 5
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 6
+              },
+              {
+                "name": "latent_image",
+                "type": "LATENT",
+                "link": 7
+              },
+              {
+                "name": "seed",
+                "type": "INT",
+                "widget": {
+                  "name": "seed"
+                },
+                "link": 15
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  8
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "KSampler"
+            },
+            "widgets_values": [
+              2026112201,
+              "fixed",
+              6,
+              1,
+              "euler",
+              "simple",
+              1
+            ]
+          },
+          {
+            "id": 7,
+            "type": "VAEDecode",
+            "title": "解码关键帧",
+            "pos": [
+              1550,
+              55
+            ],
+            "size": [
+              245,
+              64
+            ],
+            "flags": {},
+            "order": 6,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "samples",
+                "type": "LATENT",
+                "link": 8
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 9
+              }
+            ],
+            "outputs": [
+              {
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  11
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAEDecode"
+            },
+            "widgets_values": []
+          }
+        ],
+        "groups": [],
+        "links": [
+          {
+            "id": 1,
+            "origin_id": 2,
+            "origin_slot": 0,
+            "target_id": 4,
+            "target_slot": 0,
+            "type": "CLIP"
+          },
+          {
+            "id": 2,
+            "origin_id": 3,
+            "origin_slot": 0,
+            "target_id": 4,
+            "target_slot": 1,
+            "type": "VAE"
+          },
+          {
+            "id": 3,
+            "origin_id": 4,
+            "origin_slot": 0,
+            "target_id": 5,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 4,
+            "origin_id": 1,
+            "origin_slot": 0,
+            "target_id": 6,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 5,
+            "origin_id": 4,
+            "origin_slot": 0,
+            "target_id": 6,
+            "target_slot": 1,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 6,
+            "origin_id": 5,
+            "origin_slot": 0,
+            "target_id": 6,
+            "target_slot": 2,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 7,
+            "origin_id": 4,
+            "origin_slot": 1,
+            "target_id": 6,
+            "target_slot": 3,
+            "type": "LATENT"
+          },
+          {
+            "id": 8,
+            "origin_id": 6,
+            "origin_slot": 0,
+            "target_id": 7,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 9,
+            "origin_id": 3,
+            "origin_slot": 0,
+            "target_id": 7,
+            "target_slot": 1,
+            "type": "VAE"
+          },
+          {
+            "id": 12,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 4,
+            "target_slot": 3,
+            "type": "STRING"
+          },
+          {
+            "id": 13,
+            "origin_id": -10,
+            "origin_slot": 1,
+            "target_id": 4,
+            "target_slot": 4,
+            "type": "INT"
+          },
+          {
+            "id": 14,
+            "origin_id": -10,
+            "origin_slot": 2,
+            "target_id": 4,
+            "target_slot": 5,
+            "type": "INT"
+          },
+          {
+            "id": 15,
+            "origin_id": -10,
+            "origin_slot": 3,
+            "target_id": 6,
+            "target_slot": 4,
+            "type": "INT"
+          },
+          {
+            "id": 16,
+            "origin_id": -10,
+            "origin_slot": 4,
+            "target_id": 4,
+            "target_slot": 2,
+            "type": "IMAGE"
+          },
+          {
+            "id": 11,
+            "origin_id": 7,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 0,
+            "type": "IMAGE"
+          }
+        ],
+        "extra": {}
+      }
+    ]
+  },
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

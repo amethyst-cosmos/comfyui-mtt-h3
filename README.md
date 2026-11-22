@@ -9,6 +9,8 @@
 </p>
 
 <p align="center">
+  <a href="#无限画布与长剧续跑">无限画布与长剧续跑</a> ·
+  <a href="#h3-image-生图与有声镜头">H3 Image 生图</a> ·
   <a href="#安装与运行">安装与运行</a> ·
   <a href="#实卡实验与成本">实卡实验与成本</a> ·
   <a href="#机型与入口路线">机型与入口路线</a> ·
@@ -28,6 +30,42 @@
 | 一张起始图，适合先试台词、动作和运镜。 | 两张关键帧，适合明确镜头的起点和终点。 |
 
 截图来自本地 ComfyUI 0.45.3 的实际模板导入，纸船是演示输入。点击截图查看原图。
+
+## H3 Image 生图与有声镜头
+
+- **03 · H3 Image 生图与参考编辑。** 在 ComfyUI 0.45.3 中打开 `example_workflows/` 下的画布。直接填提示词可以生图。编辑时，将「加载图像」接到「H3 Image 生图」的 `images.image_1`，在提示词中用 `<Picture 1>` 指明参考图。画布以六步采样保存关键帧 PNG。
+- **04 · H3 Image 关键帧到 H3 有声视频。** 同一张画布保存生成的关键帧，并将缩放后的图接到 `MttS4000H3Shot` 的首帧输入，生成 448×800 原声试片。已有首尾帧时可以直接使用模板 02。
+
+H3 Image 画布使用 ComfyUI 原生推理，需将以下文件放入 ComfyUI 的模型目录。画布内包含下载链接。
+
+| 模型目录 | 文件 |
+| :--- | :--- |
+| `models/diffusion_models/` | `minimax_h3_image_pruned_int8_convrot.safetensors` |
+| `models/text_encoders/` | `qwen3vl_32b_minimax_h3_int8_convrot.safetensors` |
+| `models/vae/` | `minimax_h3_image_vae_fp16.safetensors` |
+
+现有 S4000 启动脚本把 ComfyUI 设为 CPU 模式。有声节点由独立 MUSA 进程运行。可以在有加速卡的 ComfyUI 中先用模板 03 生成关键帧，再把 PNG 交给 S4000 的 01 或 02。模板 04 在同一个进程里排队时，H3 Image 采用该 ComfyUI 进程的设备，视频节点要求单张 S4000。上表的图像 VAE 和 Safetensors 编码器由 ComfyUI 加载，视频 VAE 和 GGUF 编码器由 MUSA 进程加载。 [ComfyUI H3 Image 官方教程](https://docs.comfy.org/tutorials/image/minimax/minimax-h3-image)
+
+## 无限画布与长剧续跑
+
+打开 `example_workflows/05 · 无限画布分镜工作台.json`。左边的生图子图可以填提示词，也可以接「加载图像」做角色参考编辑。右边有首帧和首尾帧两种有声镜头，均可选择自己的 PNG。把生图子图的 `IMAGE` 输出拖到任一镜头的首帧口，可以直接把图接给视频。在单 S4000 的默认启动方式下，可以先在另一台已配好生图的机器上保存 PNG，再导入这张画布的视频组。
+
+1. **只跑一个输出。** 选中「保存关键帧」或某个「有声视频」输出节点，在「运行」菜单使用「执行到选定输出节点」。同时选多个输出时，ComfyUI 会运行这些输出及它们的上游。整图运行会排队所有启用的输出。
+2. **增加镜头。** 框选镜头的加载图片和视频节点，一起复制粘贴，或从节点库添加同样的节点。然后给新镜头换素材、动作和台词。各场可摆成单独一行，按住空格拖动画布。生图子图可以双击打开，内部的模型和采样设置都可编辑。
+3. **长剧分批跑。** 每镜导出一份 API JSON。导出前可将该镜头与所需上游一起复制到空白工作流，只保留该镜头需要的输出节点。将 API JSON 放入同一项目的 `shots/` 并编号，例如 `001-opening.json`、`002-wakeup.json`。镜头文件和项目记录宜放在持久盘，引用的图片放在目标 ComfyUI 的输入目录。
+
+在 Linux 或 macOS 上用 Python 3 运行队列。它通过自托管 ComfyUI 的队列接口工作。每次完成一镜就回收素材到 `renders/`，保存回执到 `receipts/`。重跑同一命令会跳过已完成项。按 Ctrl+C 会停止提交新镜头，当前镜头仍由 ComfyUI 处理，恢复后会接回其历史或队列。需要控制租卡时间时，可以给每次运行设镜头数上限。
+
+```bash
+python3 tools/queue_project.py /path/to/episode --check
+python3 tools/queue_project.py /path/to/episode --server http://127.0.0.1:6006 --limit 10
+```
+
+如果一镜失败，先检查回执，再用 `--retry-failed` 重提失败镜头。如果重启了 ComfyUI，且先前任务的历史和队列都查不到，确认旧任务已停止且没有可用输出后，用 `--retry-missing 007-shot-name` 指定重提。修改已提交的图或素材时，给修订镜头分配新的编号，保留旧回执供核对。
+
+五分钟成片可以分成约六十个五秒镜头，按场次分批展开放在画布上。单镜时长和计算量仍由实际模型和显卡决定。输出保持分镜文件，剪辑时按编号取用。
+
+模型权重可以集中在数据盘上，再把已缓存的文件软链接到对应模型目录。原生生图节点读取上表的 ComfyUI 权重，S4000 视频节点读取 `MTT_H3_MODELS`（默认是运行时下的 `models/`）。选择的本地节点和加载器须支持相应权重格式。自托管推理只调用自己的 ComfyUI，不需要第三方生图或视频 API 账号。
 
 ## 安装与运行
 
@@ -124,7 +162,7 @@ export COMFYUI_DIR=/root/ComfyUI
 | **MTT S5000** | 后续适配候选，待实机 | 按目标主机的驱动和 MUSA SDK 单独构建推理程序，复验 Flash 注意力、模型加载与有声输出。在相同镜头上建立耗时和显存基线，再评估更高分辨率、时长和吞吐。 [摩尔线程 S5000 容器指南](https://docs.mthreads.com/musa-sdk/version-5.2.0/docker_guide/) |
 | **MTT S3000 与其他 MTT 机型** | 待逐型号验证 | 根据可用硬件和工具链确定能运行的档位，每个机型单独记录验收结果。 |
 
-**当前入口是 ComfyUI 画布。** 两份工作流 JSON 保存节点、连接和默认参数。节点把关键帧、提示词、台词、种子和尺寸交给原生 MUSA 进程，保留视频和运行回执。
+**当前入口是 ComfyUI 画布。** 视频节点把关键帧、提示词、台词、种子和尺寸交给原生 MUSA 进程，保留视频和运行回执。H3 Image 模板也可独立保存关键帧 PNG。
 
 **规划中的 Agent 任务入口。** 先在 S4000 上验证可编程任务接口。Agent 可提交关键帧、提示词、台词、种子和尺寸，凭任务 ID 查询进度、取消任务、取回视频和验收结果。ComfyUI 与 Agent 入口计划共用推理后端、机型校验和媒体验收。若分发平台要求 `config.yaml`，按该平台的接入规范另行提供。
 
