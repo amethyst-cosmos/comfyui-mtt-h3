@@ -1,0 +1,37 @@
+{
+  "title": "许七安醒来 · 两镜十秒",
+  "fps": 24,
+  "seconds_per_shot": 5,
+  "image_size": [
+    576,
+    1024
+  ],
+  "video_size": [
+    576,
+    1024
+  ],
+  "character": "Xu Qi'an, a Chinese man who looks 19, slim and clean-shaven, straight dark eyebrows, a small narrow mole just below the outer corner of his left eye, black hair tied with an unadorned dark wooden pin, a rough charcoal-gray cross-collar hemp robe, frayed undyed cuffs.",
+  "cell": "The same cramped ancient Chinese jail cell: dark damp gray stone wall behind the straw mat, a narrow high window on the back-left wall, thick vertical dark wooden bars on the right toward the corridor, a chipped clay bowl by the right end of the mat. A fixed cool shaft of dawn falls diagonally from that high window; weak warm lamplight comes through the corridor bars. Faces stay legible in the shadow, real skin and coarse cloth texture.",
+  "voice": "Xu Qi'an always has the same young adult male voice, natural mainland Mandarin, clear mid register with light grain, close natural speech, unhurried in thought but quick on the punch line. Speak precisely the quoted dialogue once, with no narrator, no extra words, no music.",
+  "shots": [
+    {
+      "id": "01_wake",
+      "camera": "A · 贴地近景",
+      "first": "Ground-level close-up at the straw mat, left three-quarter view of this man lying on his right side, eyes fully closed, cheek pressed into the straw. His head and face occupy the center, with wooden bars in soft focus on the right. No other person.",
+      "last": "Same exact ground-level camera and body position. Both of his eyes have just opened. He looks toward the high window offscreen left, and his breathing has caught. His face stays still and sharp.",
+      "motion": "One continuous locked ground-level close-up. The young man draws a breath, his eyelids tremble and open naturally. His focus inches toward the high window. Keep face, hairpin, robe and camera exactly stable.",
+      "sound": "A drop of water offscreen, a sharp short inhale, straw shifting under his cheek. No speech.",
+      "seed": 2026112301
+    },
+    {
+      "id": "03_joke",
+      "camera": "C · 牢内斜侧中近景",
+      "first": "Waist-up low side angle from inside the cell. Xu Qi'an has propped himself up on his left elbow on the straw; head in three-quarter view with his mouth clearly visible. His gaze is toward the bars on screen right.",
+      "last": "The same waist-up camera. He is halfway to a seated posture, still facing screen right, with a slight asymmetric smile. His lips have returned to a neutral closed position.",
+      "motion": "Locked low medium close-up, continuous motion. He presses his left palm into the straw, pushes up a few inches, says his line around 0.9 to 4.5 seconds, one eyebrow rising on the last phrase. A brief dry smile and a small natural blink. Keep his lips visible.",
+      "dialogue": "我在哪？这床也太省料了吧。",
+      "sound": "Soft robe and straw foley beneath clear speech.",
+      "seed": 2026112303
+    }
+  ]
+}

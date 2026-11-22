@@ -45,6 +45,29 @@ SIGMAS = "1.0,0.947368421,0.857142857,0.666666667,0.0"
 TRACE_STEP = re.compile(rb"\b([1-4])/4\s+-")
 
 
+def check_s4000():
+    try:
+        detected = subprocess.check_output(["mthreads-gmi"], text=True, stderr=subprocess.STDOUT, timeout=12)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise RuntimeError("检测不到 MUSA 运行环境。请在 MTT S4000 实例运行。") from error
+    devices = re.findall(r"^\s*\d+\s+([^|\n]+)\|[0-9a-fA-F:.]+", detected, re.M)
+    if [name.strip() for name in devices] != ["MTT S4000"]:
+        raise RuntimeError("该配置需要单张可见的 MTT S4000。")
+
+
+def model_roots():
+    root = Path(os.environ.get("MTT_H3_RUNTIME", "/root/mtt-h3-runtime")).resolve()
+    return root, Path(os.environ.get("MTT_H3_MODELS", str(root / "models"))).resolve()
+
+
+def sha256_file(path):
+    checksum = hashlib.sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            checksum.update(chunk)
+    return checksum.hexdigest()
+
+
 def resolve_size(profile, width=0, height=0):
     default_width, default_height, _, _ = PROFILES[profile]
     width, height = width or default_width, height or default_height
@@ -59,8 +82,7 @@ def resolve_size(profile, width=0, height=0):
 
 def runtime_paths(profile, device=True):
     experimental = PROFILES[profile][3]
-    root = Path(os.environ.get("MTT_H3_RUNTIME", "/root/mtt-h3-runtime")).resolve()
-    models = Path(os.environ.get("MTT_H3_MODELS", str(root / "models"))).resolve()
+    root, models = model_roots()
     engine = root / ("sd-cli-chunk4096" if experimental else "sd-cli")
     native = root / "native_flash_bridge.so"
     trace = root / "trace_bridge.so"
@@ -77,13 +99,7 @@ def runtime_paths(profile, device=True):
     if any(not shutil.which(tool) for tool in ("ffmpeg", "ffprobe")):
         raise RuntimeError("请安装 FFmpeg 与 FFprobe。")
     if device:
-        try:
-            detected = subprocess.check_output(["mthreads-gmi"], text=True, stderr=subprocess.STDOUT, timeout=12)
-        except (OSError, subprocess.SubprocessError) as error:
-            raise RuntimeError("检测不到 MUSA 运行环境。请在 MTT S4000 实例运行。") from error
-        devices = re.findall(r"^\s*\d+\s+([^|\n]+)\|[0-9a-fA-F:.]+", detected, re.M)
-        if [name.strip() for name in devices] != ["MTT S4000"]:
-            raise RuntimeError("该配置需要单张可见的 MTT S4000。")
+        check_s4000()
     return engine, native, trace, weights, lora
 
 
@@ -98,9 +114,7 @@ def verify_weights(weights, lora):
             actual_edges = hashlib.sha256(first + file.read(65536)).hexdigest()
         if actual_edges != expected_edges:
             raise RuntimeError(f"模型首尾指纹不符：{path.name}")
-    with lora.open("rb") as file:
-        actual_lora = hashlib.file_digest(file, "sha256").hexdigest()
-    if actual_lora != LORA_SHA256:
+    if sha256_file(lora) != LORA_SHA256:
         raise RuntimeError(f"LoRA 指纹不符：{lora.name}")
 
 
@@ -137,7 +151,8 @@ def build_invocation(profile, paths, first, tail, prompt, seed, output, size=Non
     return command, environment
 
 
-def run_engine(command, environment, log, timeout, report_progress, check_interrupted):
+def run_engine(command, environment, log, timeout, report_progress, check_interrupted,
+               step_pattern=TRACE_STEP):
     started = time.monotonic()
     with log.open("wb") as writer, log.open("rb") as reader:
         process = subprocess.Popen(command, env=environment, stdout=writer,
@@ -148,11 +163,11 @@ def run_engine(command, environment, log, timeout, report_progress, check_interr
             while process.poll() is None:
                 check_interrupted()
                 if time.monotonic() - started >= timeout:
-                    raise RuntimeError(f"超过本镜头运行时限 {timeout} 秒。")
+                    raise RuntimeError(f"超过推理运行时限 {timeout} 秒。")
                 chunk = reader.read()
                 if chunk:
                     data = remainder + chunk
-                    next_step = max((int(match[1]) for match in TRACE_STEP.finditer(data)), default=step)
+                    next_step = max((int(match[1]) for match in step_pattern.finditer(data)), default=step)
                     if next_step > step:
                         step = next_step
                         report_progress(step)

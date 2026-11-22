@@ -1,6 +1,6 @@
 <h1 align="center">MTT H3 有声短片工作台</h1>
 
-<p align="center">基于 MiniMax H3 与 MUSA，在摩尔线程显卡上用首帧或首尾帧生成有声短片。首个适配机型是单张 MTT S4000。</p>
+<p align="center">在摩尔线程 S4000 或昇腾 910C 上，用 MiniMax H3 从文字、参考图生成有声短片。</p>
 
 <p align="center">
   <a href="https://github.com/amethyst-cosmos/comfyui-mtt-h3/releases/tag/v0.1.0-preview"><img alt="源码预览 v0.1.0-preview" src="https://img.shields.io/badge/release-v0.1.0--preview-2563eb?style=flat-square"></a>
@@ -20,7 +20,7 @@
 同一 S4000 镜头的历史原生对照中，**四步配置把进程耗时从 6 分 04 秒降到 4 分 03 秒，缩短约 33%**。两套中文模板把关键帧、动作、台词和宽高集中到一个节点，生成后可在画布内审听模型原声。
 
 > [!NOTE]
-> 当前源码预览版仅适配单张可见的 MTT S4000，需要已有 MUSA 推理环境及匹配权重。ComfyUI 节点和模板已完成桌面验证，整套环境仍待干净 S4000 冷启动验收。
+> 克隆仓库主分支可使用开机诊断、S4000 原生生图和 910C 自动分阶段工作流。`v0.1.0-preview` 是此前的 S4000 源码预览。运行需有匹配设备的推理环境和模型权重。
 
 ## 工作流截图
 
@@ -33,6 +33,35 @@
 
 ## H3 Image 生图与有声镜头
 
+### 开机后从「H3 短片」开始
+
+安装并用 `start.sh` 启动后，打开 ComfyUI 顶部 **H3 短片 → 新建 H3 镜头**。工作台会预选检测到的设备档位。选 **576×1024**，点「打开许七安 10 秒试片」，然后点 ComfyUI 的「运行」。两镜的提示词、参考图、种子和接线都在画布上可改。默认保存四张 PNG、两段原声镜头和一条 10 秒 MP4 到 `output/prison-10s/`。
+
+自己拍镜头时选择画质、关键帧来源，填写动作和对白，再点「打开工作流」。已有首尾帧可从画布的「加载图像」选择文件。直接从文字生图时，S4000 调用 MUSA，910C 自动启动独立的 H3 Image 进程。
+
+| 设备 | 画质档 | 关键帧来源 |
+| :--- | :--- | :--- |
+| S4000 | 448×800 快速首帧、576×1024 高清首尾帧试验档 | H3 Image 生成或使用已有关键帧 |
+| 昇腾 910C | 576×1024 INT8、576×1024 剪枝 BF16 | H3 Image 生成或使用已有首尾帧 |
+
+「需要配置」会展开具体检查项。S4000 检查设备、推理程序、视频工具与模型文件。910C 检查两颗逻辑 NPU、当前设备、文本编码器配置，以及所选流程需要的权重。两边都检查输出目录是否可写。缺项补齐后可点「重新检测」。这些是启动前检查。S4000 生成时还会验证权重指纹，整镜清晰度、口型、算子命中和峰值显存取决于实跑。填写实例小时价可查看历史纯视频推理的费用估算，生图、冷启动和排队时间另计。
+
+`start.sh` 默认在 6008 端口提供启动诊断，6006 端口提供工作台。通过 SSH 访问时可同时转发两个端口，并把 `H3_COMFY_PUBLIC_URL` 指向用户实际访问的 ComfyUI 地址。诊断页会显示「打开 ComfyUI」。工作台会尝试识别 910C，也可以设 `H3_WORKBENCH_BACKEND=s4000` 或 `H3_WORKBENCH_BACKEND=910c` 明确指定。
+
+### S4000 · 从文生图到有声镜头
+
+在「新建 H3 镜头」选择「H3 Image 生成关键帧」。默认首帧走文生图，高清档的尾帧引用首帧做编辑。生成的 PNG 和有声 MP4 都保存在 ComfyUI 输出目录。画布打开后可修改提示词、尺寸、种子及节点接线。也可以把「加载图像」接到首帧节点的 `reference`，并在提示词里写 `<Picture 1>` 做定妆图编辑。
+
+在共享模型库准备 `diffusion_models/minimax_h3_image_pruned-Q8_0.gguf`、`vae/minimax_h3_image_vae_fp16.safetensors`，以及带视觉编码器的 `text_encoders/qwen3vl_32b_minimax_h3-Q4_K_M.gguf`。视频正在使用同版本编码器时可直接复用。用下面的命令核对完整 SHA-256，并链接到 `MTT_H3_MODELS`。可在无卡模式执行。
+
+```bash
+python3 image_runtime.py --shared /path/to/shared/models
+```
+
+默认用运行时目录里的 `sd-cli`。需要指定另一份兼容的 MUSA 程序时设置 `MTT_H3_IMAGE_ENGINE`。ComfyUI 仍以 CPU 模式启动，生图和有声视频分别由独立的 MUSA 进程运行。ConvRot INT8 在已测的 S4000 运行时首步算子失败，`MTT_H3_IMAGE_FORMAT=convrot-int8` 仅用于兼容性实验。 [Q8 生图主模型](https://huggingface.co/unsloth/MiniMax-H3-Image-GGUF) · [图像 VAE](https://modelscope.cn/models/Comfy-Org/MiniMax-H3-Image) · [原生生图与参考编辑说明](https://github.com/leejet/stable-diffusion.cpp/blob/master/docs/models/minimax_h3_image.md)
+
+### ComfyUI 原生生图模板
+
 - **03 · H3 Image 生图与参考编辑。** 在 ComfyUI 0.45.3 中打开 `example_workflows/` 下的画布。直接填提示词可以生图。编辑时，将「加载图像」接到「H3 Image 生图」的 `images.image_1`，在提示词中用 `<Picture 1>` 指明参考图。画布以六步采样保存关键帧 PNG。
 - **04 · H3 Image 关键帧到 H3 有声视频。** 同一张画布保存生成的关键帧，并将缩放后的图接到 `MttS4000H3Shot` 的首帧输入，生成 448×800 原声试片。已有首尾帧时可以直接使用模板 02。
 
@@ -44,11 +73,49 @@ H3 Image 画布使用 ComfyUI 原生推理，需将以下文件放入 ComfyUI �
 | `models/text_encoders/` | `qwen3vl_32b_minimax_h3_int8_convrot.safetensors` |
 | `models/vae/` | `minimax_h3_image_vae_fp16.safetensors` |
 
-现有 S4000 启动脚本把 ComfyUI 设为 CPU 模式。有声节点由独立 MUSA 进程运行。可以在有加速卡的 ComfyUI 中先用模板 03 生成关键帧，再把 PNG 交给 S4000 的 01 或 02。模板 04 在同一个进程里排队时，H3 Image 采用该 ComfyUI 进程的设备，视频节点要求单张 S4000。上表的图像 VAE 和 Safetensors 编码器由 ComfyUI 加载，视频 VAE 和 GGUF 编码器由 MUSA 进程加载。 [ComfyUI H3 Image 官方教程](https://docs.comfy.org/tutorials/image/minimax/minimax-h3-image)
+模板 03 和 04 中的生图节点采用 ComfyUI 进程的设备。上表的 Safetensors 编码器由 ComfyUI 加载。用 S4000 默认启动方式生图时，从「H3 短片」菜单新建镜头，使用独立 MUSA 生图节点与 GGUF 编码器。 [ComfyUI H3 Image 官方教程](https://docs.comfy.org/tutorials/image/minimax/minimax-h3-image)
+
+### 昇腾 910C · 同一张画布出首尾帧和原声视频
+
+从工作台菜单打开的 910C 画布包含独立生图节点。它先释放视频服务缓存的 NPU 权重，在一个只监听本机的进程中使用分割注意力生成首尾帧。生图进程关闭后，两张图直接送给使用 PyTorch 注意力的 FL2VA 视频节点。已有首尾帧时可以在菜单选择「使用已有关键帧」，直接走视频。已有角色定妆图可以接到生图节点的 `reference`，在首帧提示词使用 `<Picture 1>`。
+
+用已有 CANN/TorchNPU 环境启动，文本编码在 `npu:1`，扩散与解码在 `npu:0`。视频默认使用剪枝 BF16 与八步 Turbo LoRA。除上表生图权重外，还需在 ComfyUI 的模型路径提供以下文件。已落在持久盘的权重可以用 `COMFYUI_MODEL_PATHS` 指向现有 Extra Model Paths YAML，或通过软链接复用。
+
+| 模型目录 | 文件 |
+| :--- | :--- |
+| `models/diffusion_models/` | `minimax_h3_fl2va_pruned_bf16.safetensors` |
+| `models/loras/` | `minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors` |
+| `models/vae/` | `minimax_h3_video_vae_fp16.safetensors`、`minimax_h3_audio_vae_fp32.safetensors` |
+
+模板 06 展开了原生节点，适合查看和调整图像采样参数。整片建议从菜单载入自动分阶段的工作流。实卡已通过 576×1024 两阶段推理，工作台自动衔接另用本地流程验证。当前预设保留 H3 原生声轨，建议听完每段再决定剪点。
+
+### 同一份许七安牢房试片
+
+项目描述在 `example_projects/许七安醒来10秒.json`。尺寸 576×1024，两个五秒镜头，保留 H3 音轨。项目文件可以直接改动作、构图和对白。队列先保留原始首尾帧和有声镜头，再裁切拼接并验收帧数、音轨及解码。
+
+```bash
+python3 tools/prison_trial.py prepare /path/to/run --backend s4000
+python3 tools/queue_project.py /path/to/run
+python3 tools/prison_trial.py assemble /path/to/run
+```
+
+昇腾用 `--backend 910c-bf16` 或 `--backend 910c-int8`，沿用同一组镜头、提示词和分辨率。自动队列要求使用 `start.sh` 启动 910C 视频服务。已配置原生 `CLIPLoader` 支持 `npu:1` 的实例也可以手动运行两阶段排查算子。图像服务用 `--use-split-cross-attention`，视频服务用 `--use-pytorch-cross-attention`，并将 `/path/to/video-input` 指定为视频服务的 `--input-directory`。
+
+```bash
+python3 tools/prison_trial.py prepare /path/to/images --backend 910c-bf16 --phase images
+python3 tools/queue_project.py /path/to/images --server http://127.0.0.1:8193
+python3 tools/prison_trial.py stage-images /path/to/images /path/to/video-input
+
+python3 tools/prison_trial.py prepare /path/to/video --backend 910c-bf16 --phase video
+python3 tools/queue_project.py /path/to/video --server http://127.0.0.1:8194
+python3 tools/prison_trial.py assemble /path/to/video
+```
+
+`assemble` 需要 FFmpeg 和 FFprobe。如果云镜像只负责推理，将 `/path/to/video` 中的 `renders/` 和回执下载到本地，在有这两个工具的环境执行最后一行。
 
 ## 无限画布与长剧续跑
 
-打开 `example_workflows/05 · 无限画布分镜工作台.json`。左边的生图子图可以填提示词，也可以接「加载图像」做角色参考编辑。右边有首帧和首尾帧两种有声镜头，均可选择自己的 PNG。把生图子图的 `IMAGE` 输出拖到任一镜头的首帧口，可以直接把图接给视频。在单 S4000 的默认启动方式下，可以先在另一台已配好生图的机器上保存 PNG，再导入这张画布的视频组。
+打开 `example_workflows/05 · 无限画布分镜工作台.json`。左边的生图子图可以填提示词，也可以接「加载图像」做角色参考编辑。右边有首帧和首尾帧两种有声镜头，均可选择自己的 PNG。用单张 S4000 时，可在画布添加「MiniMax H3 Image｜摩尔线程 S4000 生图与编辑」，将 `IMAGE` 输出接到镜头的首帧口。也可以直接用「H3 短片」菜单生成接线。
 
 1. **只跑一个输出。** 选中「保存关键帧」或某个「有声视频」输出节点，在「运行」菜单使用「执行到选定输出节点」。同时选多个输出时，ComfyUI 会运行这些输出及它们的上游。整图运行会排队所有启用的输出。
 2. **增加镜头。** 框选镜头的加载图片和视频节点，一起复制粘贴，或从节点库添加同样的节点。然后给新镜头换素材、动作和台词。各场可摆成单独一行，按住空格拖动画布。生图子图可以双击打开，内部的模型和采样设置都可编辑。
@@ -79,6 +146,16 @@ cd mtt-s4000-h3
 
 export COMFYUI_DIR=/root/ComfyUI
 "${COMFYUI_PYTHON:-python3}" runtime.py && bash start.sh
+```
+
+已有 910C CANN 镜像时使用相同脚本，指定 ComfyUI、Python 和持久盘模型路径。工作台的文本加载器会选第二颗逻辑 NPU。
+
+```bash
+export COMFYUI_DIR=/path/to/ComfyUI
+export COMFYUI_PYTHON=/path/to/venv/bin/python
+export COMFYUI_MODEL_PATHS=/path/to/model_paths.yaml
+export COMFYUI_OUTPUT=/path/to/persistent/output
+H3_WORKBENCH_BACKEND=910c bash start.sh
 ```
 
 **打开模板。** 默认访问 `http://127.0.0.1:6006`。从 ComfyUI 的自定义节点模板打开，或把 [首帧有声试片](example_workflows/01%20%C2%B7%20%E9%A6%96%E5%B8%A7%E6%9C%89%E5%A3%B0%E8%AF%95%E7%89%87.json) / [首尾帧高清试验](example_workflows/02%20%C2%B7%20%E9%A6%96%E5%B0%BE%E5%B8%A7%E9%AB%98%E6%B8%85%E8%AF%95%E9%AA%8C.json) 的 JSON 拖入画布。选图、填写动作和可选台词，点击「运行」。两个档位均为 124 帧、24 fps，成片约 5.17 秒。
@@ -132,7 +209,7 @@ export COMFYUI_DIR=/root/ComfyUI
 | 档位 | S4000 历史原生结果 | ComfyUI 封装 |
 | :--- | :--- | :--- |
 | **448×800** · 首帧 | 两条有声样片，约 **4 分钟落盘**（240.6–242.9 秒） | 桌面链路已验证，待实卡冷启动 |
-| **576×1024** · 首尾帧 | 一条分块诊断样片，约 **8 分钟落盘**（481.0 秒），黑屏检测为 0 秒 | 桌面模板已验证，待实卡冷启动 |
+| **576×1024** · 首尾帧 | 一条分块诊断样片，约 **8 分钟落盘**（481.0 秒），黑屏检测为 0 秒 | 48 GiB 实例通过启动诊断与两镜有声导出，单镜原生 481.6–482.6 秒 |
 
 ### 单条算力成本
 
@@ -158,7 +235,7 @@ export COMFYUI_DIR=/root/ComfyUI
 
 | 机型 | 状态 | 适配工作 |
 | :--- | :--- | :--- |
-| **MTT S4000（48 GB）** | 当前源码预览版的目标机型 | 保留历史原生基线，完成封装后的冷启动和自选尺寸验收。 |
+| **MTT S4000（48 GB）** | 当前源码预览版的目标机型 | 576×1024 的 H3 Image 文生图、参考编辑、有声视频和 10 秒导出已在实卡跑通。镜像空盘安装和其余自选尺寸仍需验收。 |
 | **MTT S5000** | 后续适配候选，待实机 | 按目标主机的驱动和 MUSA SDK 单独构建推理程序，复验 Flash 注意力、模型加载与有声输出。在相同镜头上建立耗时和显存基线，再评估更高分辨率、时长和吞吐。 [摩尔线程 S5000 容器指南](https://docs.mthreads.com/musa-sdk/version-5.2.0/docker_guide/) |
 | **MTT S3000 与其他 MTT 机型** | 待逐型号验证 | 根据可用硬件和工具链确定能运行的档位，每个机型单独记录验收结果。 |
 

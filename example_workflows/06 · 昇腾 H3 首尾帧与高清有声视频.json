@@ -1,0 +1,1586 @@
+{
+  "last_node_id": 27,
+  "last_link_id": 41,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "CLIPLoader",
+      "title": "共享文本与参考编码 · 910C npu:1",
+      "pos": [
+        40,
+        100
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            1,
+            11,
+            22
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "directory": "text_encoders",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+        "minimax",
+        "npu:1"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "UNETLoader",
+      "title": "H3 Image · 剪枝 INT8",
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        340,
+        92
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            4,
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_image_pruned_int8_convrot.safetensors",
+            "directory": "diffusion_models",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/diffusion_models/minimax_h3_image_pruned_int8_convrot.safetensors"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_image_pruned_int8_convrot.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "title": "H3 Image · 图像 VAE",
+      "pos": [
+        40,
+        420
+      ],
+      "size": [
+        340,
+        60
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            2,
+            9,
+            12,
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_image_vae_fp16.safetensors",
+            "directory": "vae",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/vae/minimax_h3_image_vae_fp16.safetensors"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_image_vae_fp16.safetensors"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "MiniMaxH3ImageConditioning",
+      "title": "首帧 · 提示词",
+      "pos": [
+        450,
+        100
+      ],
+      "size": [
+        375,
+        288
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 1
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 2,
+          "shape": 7
+        },
+        {
+          "name": "images.image_1",
+          "type": "IMAGE",
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            3,
+            5
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MiniMaxH3ImageConditioning"
+      },
+      "widgets_values": [
+        "Waist-up low side angle from inside the cell. Xu Qi'an has propped himself up on his left elbow on the straw; head in three-quarter view with his mouth clearly visible. His gaze is toward the bars on screen right.\nXu Qi'an, a Chinese man who looks 19, slim and clean-shaven, straight dark eyebrows, a small narrow mole just below the outer corner of his left eye, black hair tied with an unadorned dark wooden pin, a rough charcoal-gray cross-collar hemp robe, frayed undyed cuffs.\nThe same cramped ancient Chinese jail cell: dark damp gray stone wall behind the straw mat, a narrow high window on the back-left wall, thick vertical dark wooden bars on the right toward the corridor, a chipped clay bowl by the right end of the mat. A fixed cool shaft of dawn falls diagonally from that high window; weak warm lamplight comes through the corridor bars. Faces stay legible in the shadow, real skin and coarse cloth texture.\nLive-action film still, stable anatomy, sharp eyes and fabric. No captions or text.",
+        576,
+        1024
+      ]
+    },
+    {
+      "id": 5,
+      "type": "ConditioningZeroOut",
+      "title": "首帧 · 负向条件",
+      "pos": [
+        875,
+        410
+      ],
+      "size": [
+        215,
+        54
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 6,
+      "type": "KSampler",
+      "title": "首帧 · 六步采样",
+      "pos": [
+        875,
+        100
+      ],
+      "size": [
+        300,
+        270
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 4
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 5
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 6
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        2026112203,
+        "fixed",
+        6,
+        1,
+        "euler",
+        "simple",
+        1
+      ]
+    },
+    {
+      "id": 7,
+      "type": "VAEDecode",
+      "title": "首帧 · 解码",
+      "pos": [
+        1225,
+        100
+      ],
+      "size": [
+        225,
+        66
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 8
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            10,
+            13,
+            24
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 8,
+      "type": "SaveImage",
+      "title": "保存首帧 PNG",
+      "pos": [
+        1225,
+        220
+      ],
+      "size": [
+        225,
+        275
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 10
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "h3-cann/first"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "MiniMaxH3ImageConditioning",
+      "title": "尾帧 · 提示词",
+      "pos": [
+        450,
+        610
+      ],
+      "size": [
+        375,
+        288
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 11
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 12,
+          "shape": 7
+        },
+        {
+          "name": "images.image_1",
+          "type": "IMAGE",
+          "link": 13,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            14,
+            16
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MiniMaxH3ImageConditioning"
+      },
+      "widgets_values": [
+        "Edit <Picture 1>. The same waist-up camera. He is halfway to a seated posture, still facing screen right, with a slight asymmetric smile. His lips have returned to a neutral closed position. Preserve his exact identity, clothing, camera position, background and window light. Change only the posture and expression described above. No captions or text.",
+        576,
+        1024
+      ]
+    },
+    {
+      "id": 10,
+      "type": "ConditioningZeroOut",
+      "title": "尾帧 · 负向条件",
+      "pos": [
+        875,
+        920
+      ],
+      "size": [
+        215,
+        54
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 11,
+      "type": "KSampler",
+      "title": "尾帧 · 六步采样",
+      "pos": [
+        875,
+        610
+      ],
+      "size": [
+        300,
+        270
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 15
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 16
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 17
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        2026112213,
+        "fixed",
+        6,
+        1,
+        "euler",
+        "simple",
+        1
+      ]
+    },
+    {
+      "id": 12,
+      "type": "VAEDecode",
+      "title": "尾帧 · 解码",
+      "pos": [
+        1225,
+        610
+      ],
+      "size": [
+        225,
+        66
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 19
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            21,
+            25
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 13,
+      "type": "SaveImage",
+      "title": "保存尾帧 PNG",
+      "pos": [
+        1225,
+        730
+      ],
+      "size": [
+        225,
+        275
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 21
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "h3-cann/last"
+      ]
+    },
+    {
+      "id": 14,
+      "type": "UNETLoader",
+      "title": "H3 FL2VA · 剪枝 BF16",
+      "pos": [
+        40,
+        630
+      ],
+      "size": [
+        340,
+        92
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            26
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_fl2va_pruned_bf16.safetensors",
+            "directory": "diffusion_models",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_fl2va_pruned_bf16.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 15,
+      "type": "VAELoader",
+      "title": "H3 · 视频 VAE",
+      "pos": [
+        40,
+        780
+      ],
+      "size": [
+        340,
+        62
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            23,
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_video_vae_fp16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_video_vae_fp16.safetensors"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "VAELoader",
+      "title": "H3 · 音频 VAE",
+      "pos": [
+        40,
+        900
+      ],
+      "size": [
+        340,
+        62
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            38
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_audio_vae_fp32.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_audio_vae_fp32.safetensors"
+      ]
+    },
+    {
+      "id": 17,
+      "type": "MiniMaxH3ImageToVideo",
+      "title": "视频 · 动作、运镜与对白",
+      "pos": [
+        1550,
+        100
+      ],
+      "size": [
+        385,
+        330
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 22
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 23
+        },
+        {
+          "name": "first_frame",
+          "type": "IMAGE",
+          "link": 24
+        },
+        {
+          "name": "last_frame",
+          "type": "IMAGE",
+          "link": 25
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            29
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            30
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MiniMaxH3ImageToVideo"
+      },
+      "widgets_values": [
+        "Locked low medium close-up, continuous motion. He presses his left palm into the straw, pushes up a few inches, says his line around 0.9 to 4.5 seconds, one eyebrow rising on the last phrase. A brief dry smile and a small natural blink. Keep his lips visible.\nAudio: Soft robe and straw foley beneath clear speech.\nXu Qi'an always has the same young adult male voice, natural mainland Mandarin, clear mid register with light grain, close natural speech, unhurried in thought but quick on the punch line. Speak precisely the quoted dialogue once, with no narrator, no extra words, no music.\nXu Qi'an says: “我在哪？这床也太省料了吧。”\nThe same cramped ancient Chinese jail cell: dark damp gray stone wall behind the straw mat, a narrow high window on the back-left wall, thick vertical dark wooden bars on the right toward the corridor, a chipped clay bowl by the right end of the mat. A fixed cool shaft of dawn falls diagonally from that high window; weak warm lamplight comes through the corridor bars. Faces stay legible in the shadow, real skin and coarse cloth texture.\nLive-action film, sharply resolved in-focus subject. No captions or text overlay.",
+        576,
+        1024,
+        124
+      ]
+    },
+    {
+      "id": 18,
+      "type": "LoraLoaderModelOnly",
+      "title": "Turbo LoRA · 强度 1",
+      "pos": [
+        1550,
+        510
+      ],
+      "size": [
+        385,
+        110
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 26
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            27,
+            28
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly",
+        "models": [
+          {
+            "name": "minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
+            "url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/main/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
+            "directory": "loras"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
+        1
+      ]
+    },
+    {
+      "id": 19,
+      "type": "RandomNoise",
+      "title": "视频种子",
+      "pos": [
+        1980,
+        325
+      ],
+      "size": [
+        260,
+        90
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "NOISE",
+          "type": "NOISE",
+          "links": [
+            31
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RandomNoise"
+      },
+      "widgets_values": [
+        2026112303,
+        "fixed"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "KSamplerSelect",
+      "title": "视频采样器",
+      "pos": [
+        1980,
+        455
+      ],
+      "size": [
+        260,
+        60
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            32
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerSelect"
+      },
+      "widgets_values": [
+        "res_multistep"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "BasicScheduler",
+      "title": "视频调度 · 八步",
+      "pos": [
+        1980,
+        555
+      ],
+      "size": [
+        260,
+        115
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 28
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            33
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BasicScheduler"
+      },
+      "widgets_values": [
+        "simple",
+        8,
+        1
+      ]
+    },
+    {
+      "id": 22,
+      "type": "BasicGuider",
+      "title": "视频引导",
+      "pos": [
+        1980,
+        105
+      ],
+      "size": [
+        260,
+        70
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 27
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            34
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BasicGuider"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 23,
+      "type": "SamplerCustomAdvanced",
+      "title": "H3 · 视频与声音联合采样",
+      "pos": [
+        2290,
+        100
+      ],
+      "size": [
+        280,
+        150
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 31
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 34
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 32
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 33
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            35,
+            36
+          ]
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SamplerCustomAdvanced"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 24,
+      "type": "VAEDecode",
+      "title": "解码视频",
+      "pos": [
+        2620,
+        105
+      ],
+      "size": [
+        240,
+        70
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 35
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 37
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 25,
+      "type": "VAEDecodeAudio",
+      "title": "解码 H3 原声",
+      "pos": [
+        2620,
+        225
+      ],
+      "size": [
+        240,
+        70
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 36
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 38
+        }
+      ],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            40
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecodeAudio"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 26,
+      "type": "CreateVideo",
+      "title": "合并视频与原声音轨",
+      "pos": [
+        2620,
+        355
+      ],
+      "size": [
+        240,
+        145
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 39
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 40
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CreateVideo"
+      },
+      "widgets_values": [
+        24,
+        8,
+        "sRGB",
+        "auto",
+        "none"
+      ]
+    },
+    {
+      "id": 27,
+      "type": "SaveVideo",
+      "title": "保存并预览有声 MP4",
+      "pos": [
+        2910,
+        100
+      ],
+      "size": [
+        330,
+        450
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "h3-cann/shot",
+        "auto",
+        "auto"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      4,
+      0,
+      "CLIP"
+    ],
+    [
+      2,
+      3,
+      0,
+      4,
+      1,
+      "VAE"
+    ],
+    [
+      3,
+      4,
+      0,
+      5,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      4,
+      2,
+      0,
+      6,
+      0,
+      "MODEL"
+    ],
+    [
+      5,
+      4,
+      0,
+      6,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      6,
+      5,
+      0,
+      6,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      7,
+      4,
+      1,
+      6,
+      3,
+      "LATENT"
+    ],
+    [
+      8,
+      6,
+      0,
+      7,
+      0,
+      "LATENT"
+    ],
+    [
+      9,
+      3,
+      0,
+      7,
+      1,
+      "VAE"
+    ],
+    [
+      10,
+      7,
+      0,
+      8,
+      0,
+      "IMAGE"
+    ],
+    [
+      11,
+      1,
+      0,
+      9,
+      0,
+      "CLIP"
+    ],
+    [
+      12,
+      3,
+      0,
+      9,
+      1,
+      "VAE"
+    ],
+    [
+      13,
+      7,
+      0,
+      9,
+      2,
+      "IMAGE"
+    ],
+    [
+      14,
+      9,
+      0,
+      10,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      15,
+      2,
+      0,
+      11,
+      0,
+      "MODEL"
+    ],
+    [
+      16,
+      9,
+      0,
+      11,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      17,
+      10,
+      0,
+      11,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      18,
+      9,
+      1,
+      11,
+      3,
+      "LATENT"
+    ],
+    [
+      19,
+      11,
+      0,
+      12,
+      0,
+      "LATENT"
+    ],
+    [
+      20,
+      3,
+      0,
+      12,
+      1,
+      "VAE"
+    ],
+    [
+      21,
+      12,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ],
+    [
+      22,
+      1,
+      0,
+      17,
+      0,
+      "CLIP"
+    ],
+    [
+      23,
+      15,
+      0,
+      17,
+      1,
+      "VAE"
+    ],
+    [
+      24,
+      7,
+      0,
+      17,
+      2,
+      "IMAGE"
+    ],
+    [
+      25,
+      12,
+      0,
+      17,
+      3,
+      "IMAGE"
+    ],
+    [
+      26,
+      14,
+      0,
+      18,
+      0,
+      "MODEL"
+    ],
+    [
+      27,
+      18,
+      0,
+      22,
+      0,
+      "MODEL"
+    ],
+    [
+      28,
+      18,
+      0,
+      21,
+      0,
+      "MODEL"
+    ],
+    [
+      29,
+      17,
+      0,
+      22,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      30,
+      17,
+      1,
+      23,
+      4,
+      "LATENT"
+    ],
+    [
+      31,
+      19,
+      0,
+      23,
+      0,
+      "NOISE"
+    ],
+    [
+      32,
+      20,
+      0,
+      23,
+      2,
+      "SAMPLER"
+    ],
+    [
+      33,
+      21,
+      0,
+      23,
+      3,
+      "SIGMAS"
+    ],
+    [
+      34,
+      22,
+      0,
+      23,
+      1,
+      "GUIDER"
+    ],
+    [
+      35,
+      23,
+      0,
+      24,
+      0,
+      "LATENT"
+    ],
+    [
+      36,
+      23,
+      0,
+      25,
+      0,
+      "LATENT"
+    ],
+    [
+      37,
+      15,
+      0,
+      24,
+      1,
+      "VAE"
+    ],
+    [
+      38,
+      16,
+      0,
+      25,
+      1,
+      "VAE"
+    ],
+    [
+      39,
+      24,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      40,
+      25,
+      0,
+      26,
+      1,
+      "AUDIO"
+    ],
+    [
+      41,
+      26,
+      0,
+      27,
+      0,
+      "VIDEO"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "模型与设备",
+      "bounding": [
+        20,
+        38,
+        380,
+        970
+      ],
+      "color": "#61708d",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "首帧 · H3 Image",
+      "bounding": [
+        430,
+        38,
+        1040,
+        480
+      ],
+      "color": "#46746b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "尾帧 · 编辑首帧",
+      "bounding": [
+        430,
+        548,
+        1040,
+        480
+      ],
+      "color": "#507d73",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "576×1024 · H3 有声视频",
+      "bounding": [
+        1530,
+        38,
+        1730,
+        660
+      ],
+      "color": "#746894",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.4,
+      "offset": [
+        24,
+        24
+      ]
+    }
+  },
+  "version": 0.4
+}
