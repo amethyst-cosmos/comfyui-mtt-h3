@@ -21,7 +21,7 @@ import yaml
 from comfy import model_management, ops, sd
 from comfy.cli_args import args
 
-from .tools.prison_trial import CLIP, IMAGE, IMAGE_VAE, SIZE, Graph, cann_image
+from .cann_graph import CLIP, IMAGE, IMAGE_VAE, SIZE, Graph, cann_image
 from .tools.queue_project import api
 
 

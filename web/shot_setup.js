@@ -49,12 +49,6 @@ async function openSetup() {
   field(form, "运行设备", device);
   field(form, "画质档", quality);
   field(form, "关键帧来源", source);
-  const example = document.createElement("button");
-  example.type = "button";
-  example.textContent = "打开许七安 10 秒试片";
-  example.disabled = true;
-  example.style.marginBottom = "12px";
-  form.append(example);
   const diagnostics = document.createElement("details");
   const status = document.createElement("summary");
   status.setAttribute("aria-live", "polite");
@@ -125,9 +119,6 @@ async function openSetup() {
     const profile = catalog[quality.value];
     const generate = source.value === "generate";
     attentionNote.hidden = profile.backend !== "910c";
-    const shortProfile = quality.value === "musa-fast";
-    example.disabled = shortProfile;
-    example.title = shortProfile ? "10 秒试片使用 576×1024 高清档" : "在画布打开两个可编辑镜头";
     for (const key of ["first_prompt", "last_prompt"]) {
       const shouldShow = generate && (key === "first_prompt" || profile.requires_last);
       inputs[key].area.hidden = !shouldShow;
@@ -167,7 +158,6 @@ async function openSetup() {
   async function detect() {
     refresh.disabled = true;
     open.disabled = true;
-    example.disabled = true;
     errorBox.textContent = "";
     status.textContent = "正在检测当前 GPU 实例…";
     try {
@@ -198,17 +188,6 @@ async function openSetup() {
     if (loaded === false) throw new Error("ComfyUI 未能打开新工作流。");
     dialog.close();
   }
-  example.addEventListener("click", async () => {
-    example.disabled = true;
-    errorBox.textContent = "";
-    try {
-      const graph = await request(`example/${quality.value}`);
-      await loadWorkflow(graph, "许七安醒来 10 秒.json");
-    } catch (error) {
-      errorBox.textContent = error.message;
-      example.disabled = false;
-    }
-  });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     open.disabled = true;
